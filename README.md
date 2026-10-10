@@ -17,3 +17,5 @@ NOTE: I rlly havent done anything much the last 2 days, other than trying to con
 10th October 2026
 
 well, its the last day so I gotta really speedrun this 
+
+its currently 10pm and im still not done.............
