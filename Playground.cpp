@@ -5,8 +5,6 @@
 
 using namespace std;
 
-//this is my 2 hour b4 the deadline 
-
 class Map{
     private:
     
@@ -37,6 +35,7 @@ class Map{
     int getRx() const {
         return Rx;
     }
+
     int getRy() const {
         return Ry;
     }
@@ -48,7 +47,7 @@ class Map{
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
-        { '.', '0', '.', 'R', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
+        { '.', '.', '.', 'R', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.' },
@@ -87,6 +86,7 @@ class Map{
 
 };
 
+//this is my code aprox an hour b4 deadline
 
 
 class Robot{
@@ -99,10 +99,23 @@ class Robot{
     Map& A;
     int xrobot = 0;
     int yrobot = 0;
-    int xscan = 0;
-    int yscan = 0;
+    int xball = 0;
+    int yball = 0;
 
+    //point of interest
+    int xpoi = 3;
+    int ypoi = 3;
+
+    
+
+    //ball condition
+    bool ballfound = false;
+    bool ballmoving = false;
+
+    //robot condition
+    bool robotonpoi = false;
     public: 
+
 
     
     //ai assisted
@@ -132,6 +145,21 @@ class Robot{
         return yrobot;
     }
    
+    int getxball() const {
+        return xball;
+    }
+
+    int getyball() const {
+        return yball;
+    }
+
+    bool getballfound() const {
+        return ballfound;
+    }
+
+    bool getrobotonpoi() const {
+        return robotonpoi;
+    }
     //AI assisted
     vector<pair<int, int>> getScanLocation() const {
         return scanlocation;
@@ -157,14 +185,9 @@ class Robot{
         
         
 
-        //AI assisted
-        /*
-        for (const auto& callback : moveCallbacks) {
-            callback(xrobot, yrobot);
-        }
-        */
-
         cout << "callback recieved (" << xrobot + 1 << ", " << yrobot + 1 << ")" << endl;
+        } else if(A.field[yrobot][xrobot + 1] == '0'){
+            ballfound = true;
         }
     }
 
@@ -178,12 +201,7 @@ class Robot{
         A.field[yrobot][xrobot] = 'R';
 
          A.updatelocation(xrobot, yrobot);
-        /*
-        //AI assisted
-        for (const auto& callback : moveCallbacks) {
-            callback(xrobot, yrobot);
-        }
-        */
+      
 
         cout << "callback recieved (" << xrobot + 1 << ", " << yrobot + 1 << ")" << endl;
         }
@@ -224,57 +242,19 @@ class Robot{
         for(int i = 1; i <= 3; i++){
             for(int j = 0; j <= i; j++){
                 if(!(A.field[yrobot - j][xrobot + i] == '.')){
-
+                    xball = xrobot + i;
+                    yball = yrobot - j;
                 } else {
                     A.field[yrobot - j][xrobot + i] = '@';
                 }
 
                 if(!(A.field[yrobot + j][xrobot + i] == '.')){
-                    
+                    xball = xrobot + i;
+                    yball = yrobot + j;
                 } else {
                     A.field[yrobot + j][xrobot + i] = '@';
                 }
-            
 
-                /*
-                if(!(A.field[yrobot][xrobot + i] == '.')){
-
-                } else {
-                    A.field[yrobot][xrobot + i] = '@';
-                }
-                */
-
-
-            }//nested for
-            
-        }//for
-
-       
-
-    }//void 
-
-    void scanleft(){
-
-        for(int i = 1; i <= 3; i++){
-            for(int j = 0; j <= i; j++){
-                if(!(A.field[yrobot - j][xrobot - i] == '.')){
-
-                } else {
-                    A.field[yrobot - j][xrobot - i] = '@';
-                }
-                if(!(A.field[yrobot + j][xrobot - i] == '.')){
-                    
-                } else {
-                    A.field[yrobot + j][xrobot - i] = '@';
-                }
-
-                /*
-                if(!(A.field[yrobot][xrobot - i] == '.')){
-
-                } else {
-                    A.field[yrobot][xrobot - i] = '@';
-                }
-                */
 
             }//nested for
             
@@ -306,7 +286,7 @@ class Robot{
                     continue;
                 }
 
-                if(A.field[i][j] == '@' || A.field[i][j] == '0'){
+                if(A.field[i][j] == '@'){
                     //ai assisted
                     scanlocation.push_back({i, j});
                 }
@@ -323,7 +303,9 @@ class Robot{
             int x = scanlocation[i].second;
             
             if(A.field[x - xrobot + yrobot][xrobot + yrobot - y] == '0'){
-
+                xball = xrobot + yrobot - y;
+                yball = x - xrobot + yrobot;
+                ballfound = true;
             } else {
                 A.field[x - xrobot + yrobot][xrobot + yrobot - y] = '@';
             }
@@ -332,6 +314,33 @@ class Robot{
             //A.mapcondition();
         }
     }
+
+    void updatePoi(){
+        if(ballfound == true){
+            xpoi = xball - 1; 
+            ypoi = yball;
+        } else {
+            xpoi = 3;
+            ypoi = 3;
+        }
+    }
+
+    void movetopoi(){
+    if(A.field[yrobot][xrobot] == A.field[ypoi][xpoi]){
+        robotonpoi = true;
+    } else if(xrobot < xpoi){
+            moveright();
+        } else if(xrobot > xpoi){
+            if(!(A.field[yrobot][xrobot - 1] == '.')){
+                moveup();
+            }
+            moveleft();
+        } else if(yrobot < ypoi){
+            movedown();
+        } else if(yrobot > ypoi){
+            moveup();
+        }
+}
 
 };
 
@@ -351,13 +360,38 @@ int main(){
     robotclass.scanright();
     mapclass.mapcondition();
 
+    int rotatecounter = 1;
+    while(!(robotclass.getballfound() == true)){
+    if(rotatecounter == 4){
+        rotatecounter = 1;
+        break;
+    }
+    robotclass.rotate2();
+    mapclass.mapcondition();
+    rotatecounter++;
+    }
+
+    while(!(robotclass.getrobotonpoi() == true)){
+        robotclass.movetopoi();
+        robotclass.updatePoi();
+        mapclass.mapcondition();
+    }
+
+    robotclass.scanright();
+    mapclass.mapcondition();
+    while(!(robotclass.getballfound() == true)){
+    if(rotatecounter == 4){
+        rotatecounter = 1;
+        break;
+    }
+    robotclass.rotate2();
+    mapclass.mapcondition();
+    rotatecounter++;
+    }
+   
     
-    robotclass.rotate2();
-    mapclass.mapcondition();
-    robotclass.rotate2();
-    mapclass.mapcondition();
-    robotclass.rotate2();
-    mapclass.mapcondition();
+
+    //cout << robotclass.getxball() << " " << robotclass.getyball();
    
 
 }
