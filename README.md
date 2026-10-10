@@ -13,3 +13,7 @@ im gonna today night to rest
 
 9th October 2026
 NOTE: I rlly havent done anything much the last 2 days, other than trying to connect comunication between multiple different classes. im probly gonna update the github after this session is done
+
+10th October 2026
+
+well, its the last day so I gotta really speedrun this 
