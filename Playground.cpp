@@ -5,6 +5,11 @@
 
 using namespace std;
 
+/*this is the last update within the given deadline
+i am still going to work on it even after the deadline ends because i am not at all happy
+with how it turned out to be. despite me not being able to finish it on the give deadline,
+I still wish to Finsih it. if nothing else, for my sake.
+*/
 class Map{
     private:
     
@@ -45,7 +50,7 @@ class Map{
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
-        { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
+        { '.', '.', '.', '0', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', 'R', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
@@ -86,15 +91,12 @@ class Map{
 
 };
 
-//this is my code aprox an hour b4 deadline
+
 
 
 class Robot{
     private:
     //robot location
-
-    //ai assisted
-   
     
     Map& A;
     int xrobot = 0;
@@ -130,11 +132,7 @@ class Robot{
     void location(){
         A.checklocation();
     }
-    /*AI assited
-     void registerOnMove(function<void(int, int)> callback) {
-        moveCallbacks.push_back(callback);
-    } //a lambda (whatever that is) (suppose to help update the robot position on the map)
-    */
+    
 
     //getter function
     int getxrobot() const {
@@ -160,6 +158,14 @@ class Robot{
     bool getrobotonpoi() const {
         return robotonpoi;
     }
+    int getxpoi() const {
+        return xpoi;
+    }
+
+    int getypoi() const {
+        return ypoi;
+    }
+
     //AI assisted
     vector<pair<int, int>> getScanLocation() const {
         return scanlocation;
@@ -172,6 +178,8 @@ class Robot{
         yrobot = A.getRy();
     }
 
+
+    //movement
     void moveright(){
         updatelocation();
         unscan();
@@ -187,7 +195,10 @@ class Robot{
 
         cout << "callback recieved (" << xrobot + 1 << ", " << yrobot + 1 << ")" << endl;
         } else if(A.field[yrobot][xrobot + 1] == '0'){
+            xball = xrobot + 1;
+            yball = yrobot;
             ballfound = true;
+            updatePoi();
         }
     }
 
@@ -204,6 +215,11 @@ class Robot{
       
 
         cout << "callback recieved (" << xrobot + 1 << ", " << yrobot + 1 << ")" << endl;
+        } else if(A.field[yrobot][xrobot - 1] == '0'){
+            xball = xrobot - 1;
+            yball = yrobot;
+            ballfound = true;
+            updatePoi();
         }
     }
     
@@ -219,6 +235,11 @@ class Robot{
          A.updatelocation(xrobot, yrobot);
 
         cout << "callback recieved (" << xrobot + 1 << ", " << yrobot + 1 << ")" << endl;
+        }else if(A.field[yrobot - 1][xrobot] == '0'){
+            xball = xrobot;
+            yball = yrobot - 1;
+            ballfound = true;
+            updatePoi();
         }
     }
 
@@ -234,23 +255,33 @@ class Robot{
          A.updatelocation(xrobot, yrobot);
 
         cout << "callback recieved (" << xrobot + 1 << ", " << yrobot + 1 << ")" << endl;
+        } else if(A.field[yrobot + 1][xrobot] == '0'){
+            xball = xrobot;
+            yball = yrobot + 1;
+            ballfound = true;
+            updatePoi();
         }
     }
+    //movement
 
+
+    //scan
     void scanright(){
 
         for(int i = 1; i <= 3; i++){
             for(int j = 0; j <= i; j++){
-                if(!(A.field[yrobot - j][xrobot + i] == '.')){
+                if((A.field[yrobot - j][xrobot + i] == '0')){
                     xball = xrobot + i;
                     yball = yrobot - j;
+                    ballfound = true;
                 } else {
                     A.field[yrobot - j][xrobot + i] = '@';
                 }
 
-                if(!(A.field[yrobot + j][xrobot + i] == '.')){
+                if((A.field[yrobot + j][xrobot + i] == '0')){
                     xball = xrobot + i;
                     yball = yrobot + j;
+                    ballfound = true;
                 } else {
                     A.field[yrobot + j][xrobot + i] = '@';
                 }
@@ -314,9 +345,12 @@ class Robot{
             //A.mapcondition();
         }
     }
+    //scan
 
+
+    //poi
     void updatePoi(){
-        if(ballfound == true){
+        if(ballfound){
             xpoi = xball - 1; 
             ypoi = yball;
         } else {
@@ -326,24 +360,39 @@ class Robot{
     }
 
     void movetopoi(){
+        
     if(A.field[yrobot][xrobot] == A.field[ypoi][xpoi]){
-        robotonpoi = true;
-    } else if(xrobot < xpoi){
+        robotonpoi = (xrobot == xpoi && yrobot == ypoi); //AI assisted
+        return;
+
+    }
+    
+    if(xrobot < xpoi){
             moveright();
+
         } else if(xrobot > xpoi){
             if(!(A.field[yrobot][xrobot - 1] == '.')){
                 moveup();
-            }
+            } else {
             moveleft();
+            }
         } else if(yrobot < ypoi){
             movedown();
+
         } else if(yrobot > ypoi){
+            if(!(A.field[yrobot][xrobot - 1] == '.')){
+                moveleft();
+            } else {
             moveup();
+            }
         }
 }
-
+    //poi
 };
 
+class stricker : public Robot{
+
+};
 
 int main(){
     Map mapclass;
@@ -354,44 +403,31 @@ int main(){
     });
     */
     
+    cout << robotclass.getxpoi() << " " << robotclass.getypoi() << endl;
+        cout << robotclass.getxball() << " " << robotclass.getyball() << endl;
     
     robotclass.location();
     robotclass.updatelocation();
     robotclass.scanright();
     mapclass.mapcondition();
 
+    cout << robotclass.getxpoi() << " " << robotclass.getypoi() << endl;
+    cout << robotclass.getxball() << " " << robotclass.getyball() << endl;
+
+    //get robot to POI
     int rotatecounter = 1;
-    while(!(robotclass.getballfound() == true)){
-    if(rotatecounter == 4){
-        rotatecounter = 1;
-        break;
-    }
-    robotclass.rotate2();
-    mapclass.mapcondition();
-    rotatecounter++;
-    }
-
-    while(!(robotclass.getrobotonpoi() == true)){
-        robotclass.movetopoi();
+    while(!(robotclass.getrobotonpoi())){
         robotclass.updatePoi();
+        robotclass.movetopoi();
         mapclass.mapcondition();
-    }
 
-    robotclass.scanright();
-    mapclass.mapcondition();
-    while(!(robotclass.getballfound() == true)){
-    if(rotatecounter == 4){
-        rotatecounter = 1;
-        break;
-    }
-    robotclass.rotate2();
-    mapclass.mapcondition();
-    rotatecounter++;
+        cout << robotclass.getxpoi() << " " << robotclass.getypoi() << endl;
+        cout << robotclass.getxball() << " " << robotclass.getyball() << endl;
     }
    
     
 
-    //cout << robotclass.getxball() << " " << robotclass.getyball();
+    
    
 
 }
