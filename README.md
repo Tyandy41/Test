@@ -1,3 +1,9 @@
+AI Usage
+The constructor (Robot(Map& Map) : A(Map) {})
+To save a points x, y location and how to call it back (scanlocation.push_back({i, j});)
+getter function for xrobot and yrobot
+and for debugging purposes
+
 Hello, This is (probably) going to be a diary of sort for my Internship Journey. Enjoy! (or smth, idk)
 
 6th October 2026
@@ -18,4 +24,4 @@ NOTE: I rlly havent done anything much the last 2 days, other than trying to con
 
 well, its the last day so I gotta really speedrun this 
 
-its currently 10pm and im still not done.............
+its currently 10pm and im still not done...........
