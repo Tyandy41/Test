@@ -5,11 +5,6 @@
 
 using namespace std;
 
-/*this is the last update within the given deadline
-i am still going to work on it even after the deadline ends because i am not at all happy
-with how it turned out to be. despite me not being able to finish it on the give deadline,
-I still wish to Finsih it. if nothing else, for my sake.
-*/
 class Map{
     private:
     
