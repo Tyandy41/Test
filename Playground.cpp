@@ -1,9 +1,11 @@
 #include <iostream>
 #include <functional>
 #include <vector>
+#include <utility>
+
 using namespace std;
 
-
+//this is my 2 hour b4 the deadline 
 
 class Map{
     private:
@@ -46,7 +48,7 @@ class Map{
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
-        { '.', '.', '.', 'R', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
+        { '.', '0', '.', 'R', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '#' },
         { '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.' },
@@ -91,17 +93,21 @@ class Robot{
     private:
     //robot location
 
-    /*AI assisted
-    vector<function<void(int, int)>> moveCallbacks; //this is what allows the lambda to function
-    */
-
+    //ai assisted
+   
     
     Map& A;
     int xrobot = 0;
     int yrobot = 0;
+    int xscan = 0;
+    int yscan = 0;
 
     public: 
 
+    
+    //ai assisted
+    vector<pair<int, int>> scanlocation;
+    
     //ai assisted
     Robot(Map& Map) : A(Map) {}
         // This is a constructor, to initialize the class with other class.
@@ -125,6 +131,12 @@ class Robot{
     int getyrobot() const {
         return yrobot;
     }
+   
+    //AI assisted
+    vector<pair<int, int>> getScanLocation() const {
+        return scanlocation;
+    }
+
     //getter function
 
     void updatelocation(){
@@ -210,23 +222,27 @@ class Robot{
     void scanright(){
 
         for(int i = 1; i <= 3; i++){
-            for(int j = 1; j <= i; j++){
+            for(int j = 0; j <= i; j++){
                 if(!(A.field[yrobot - j][xrobot + i] == '.')){
 
                 } else {
                     A.field[yrobot - j][xrobot + i] = '@';
                 }
+
                 if(!(A.field[yrobot + j][xrobot + i] == '.')){
                     
                 } else {
                     A.field[yrobot + j][xrobot + i] = '@';
                 }
+            
 
+                /*
                 if(!(A.field[yrobot][xrobot + i] == '.')){
 
                 } else {
                     A.field[yrobot][xrobot + i] = '@';
                 }
+                */
 
 
             }//nested for
@@ -240,7 +256,7 @@ class Robot{
     void scanleft(){
 
         for(int i = 1; i <= 3; i++){
-            for(int j = 1; j <= i; j++){
+            for(int j = 0; j <= i; j++){
                 if(!(A.field[yrobot - j][xrobot - i] == '.')){
 
                 } else {
@@ -252,12 +268,13 @@ class Robot{
                     A.field[yrobot + j][xrobot - i] = '@';
                 }
 
+                /*
                 if(!(A.field[yrobot][xrobot - i] == '.')){
 
                 } else {
                     A.field[yrobot][xrobot - i] = '@';
                 }
-
+                */
 
             }//nested for
             
@@ -277,98 +294,51 @@ class Robot{
         }
     }
 
-
-    void rotate(){
-        for(int i = 1; i <= 3; i++){
-            for(int j = 1; j <= i; j++){
-                
+    void surrounding(){
+        scanlocation.clear(); 
+        for(int i = yrobot - 3; i <= yrobot + 3; i++){
+            if(i < 0 || i >= 12) {
+            continue; 
             }
+
+            for(int j = xrobot - 3; j <= xrobot + 3; j++){
+                if(j < 0 || j >= 18) {
+                    continue;
+                }
+
+                if(A.field[i][j] == '@' || A.field[i][j] == '0'){
+                    //ai assisted
+                    scanlocation.push_back({i, j});
+                }
+            }
+
         }
-
-
     }
-    /*
-    void rotate(){
-        
-        //wish I knew how to implement the mathmathical equation for this......
-        
+
+    void rotate2(){
+        surrounding();
         unscan();
-
-
-        //A.field[yrobot][xrobot]
-        //right -> down
-        if(A.field[yrobot][xrobot + 1] == '@'){
-
-            for(int i = 1; i <= 3; i++){
-                for(int j = 1; j <= i; j++ ){
-                    if(!(A.field[yrobot - j][xrobot - i] == '.')){
-
-                    } else {
-                        A.field[yrobot - i][xrobot - j] = '@';
-                    }
-                    if(!(A.field[yrobot + i][xrobot - j] == '.')){
-                    
-                    } else {
-                        A.field[yrobot + i][xrobot - j] = '@';
-                    }
-
-                    if(!(A.field[yrobot + i][xrobot] == '.')){
-
-                    } else {
-                        A.field[yrobot + i][xrobot] = '@';
-                    }
-
-                }
-            }
-
-        } else if(A.field[yrobot + 1][xrobot] == '@'){ //down -> left
-
-        } else if(A.field[yrobot][xrobot - 1] == '@'){ //left -> up
-
-        } else if(A.field[yrobot - 1][xrobot] == '@'){ // up -> right (might not need this tho)
-
-        }
-
-    }
-   */
-    /*
-    void unscan(){
-
-        for(int i = 1; i <= 3; i++){
-            for(int j = 1; j <= i; j++){
-                if(!(A.field[yrobot - j][xrobot + i] == '@')){
-
-                } else {
-                    A.field[yrobot - j][xrobot + i] = '.';
-                }
-                if(!(A.field[yrobot + j][xrobot + i] == '@')){
-                    
-                } else {
-                    A.field[yrobot + j][xrobot + i] = '.';
-                }
-
-                if(!(A.field[yrobot][xrobot + i] == '@')){
-
-                } else {
-                    A.field[yrobot][xrobot + i] = '.';
-                }
-
-
-            }//nested for
+        for(int i = 0; i < scanlocation.size(); i++){
+            int y = scanlocation[i].first;
+            int x = scanlocation[i].second;
             
-        }//for
+            if(A.field[x - xrobot + yrobot][xrobot + yrobot - y] == '0'){
 
-       
+            } else {
+                A.field[x - xrobot + yrobot][xrobot + yrobot - y] = '@';
+            }
+            
 
-    }//void 
-    */
+            //A.mapcondition();
+        }
+    }
 
 };
 
 
 int main(){
     Map mapclass;
-    Robot robotclass  (mapclass);
+    Robot robotclass (mapclass);
 
     /*
     robotclass.registerOnMove([&mapclass](int x, int y) {
@@ -381,8 +351,12 @@ int main(){
     robotclass.scanright();
     mapclass.mapcondition();
 
-    robotclass.moveright();
-    robotclass.scanright();
+    
+    robotclass.rotate2();
+    mapclass.mapcondition();
+    robotclass.rotate2();
+    mapclass.mapcondition();
+    robotclass.rotate2();
     mapclass.mapcondition();
    
 
